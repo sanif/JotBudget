@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="accent_grey_200">#EEEEEE</color>
+    <color name="accent_grey_300">#E0E0E0</color>
+
+    <color name="yellow">#FBC02D</color>
+    <color name="window_background">#FFF5F5F5</color>
+
+    <color name="primary_color">#4CAF50</color>
+    <color name="dark_primary_color">#388E3C</color>
+    <color name="accent_color">#FF5252</color>
+    <color name="accent_color_pressed">#F44336</color>
+    <color name="light_primary_color">#C8E6C9</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#727272</color>
+    <color name="divider_color">#B6B6B6</color>
+
+    <color name="blue">#2196F3</color>
+    <color name="dark_blue">#1976D2</color>
+    <color name="white">#fafafa</color>
+
+    <color name="fab_menu_background">#ccffffff</color>
+
+    <color name="expense_graph_color_1">#D32F2F</color>
+    <color name="expense_graph_color_2">#FF9800</color>
+    <color name="expense_graph_color_3">#FF5722</color>
+    <color name="expense_graph_color_4">#FF9800</color>
+    <color name="expense_graph_color_5">#F44336</color>
+
+    <color name="income_graph_color_1">#388E3C</color>
+    <color name="income_graph_color_2">#CDDC39</color>
+    <color name="income_graph_color_3">#4CAF50</color>
+    <color name="income_graph_color_4">#CDDC39</color>
+    <color name="income_graph_color_5">#03A9F4</color>
+</resources>

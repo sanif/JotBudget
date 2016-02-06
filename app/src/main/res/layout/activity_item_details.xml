@@ -1,0 +1,130 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/accent_grey_200"
+              android:descendantFocusability="beforeDescendants"
+              android:focusableInTouchMode="true"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/vertical_margin"
+              tools:context="com.tr.bnotes.ItemDetailsActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/detailsToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="@dimen/description_field_width"
+            android:layout_height="wrap_content"
+            android:text="@string/expense_type"
+            android:textSize="@dimen/item_details_text_size"/>
+
+        <EditText
+            android:id="@+id/typeValueEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="start"
+            android:hint="@string/hint_pick_the_type"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:textIsSelectable="false"
+            android:textSize="@dimen/item_details_text_size"/>
+    </LinearLayout>
+
+    <include layout="@layout/include_item_details_delimiter"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/Date"
+            android:layout_width="@dimen/description_field_width"
+            android:layout_height="wrap_content"
+            android:text="@string/date"
+            android:textSize="@dimen/item_details_text_size"/>
+
+        <EditText
+            android:id="@+id/dateValText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:focusable="false"
+            android:gravity="start"
+            android:inputType="date"
+            android:textSize="@dimen/item_details_text_size"/>
+    </LinearLayout>
+
+    <include layout="@layout/include_item_details_delimiter"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="@dimen/description_field_width"
+            android:layout_height="wrap_content"
+            android:text="@string/amount"
+            android:textSize="@dimen/item_details_text_size"/>
+
+        <TextView
+            android:id="@+id/signView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/item_details_text_size"/>
+
+        <com.tr.bnotes.NoSelectionEditText
+            android:id="@+id/amountView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:gravity="start"
+            android:inputType="numberDecimal"
+            android:longClickable="false"
+            android:maxLength="16"
+            android:textSize="@dimen/item_details_text_size"/>
+    </LinearLayout>
+
+    <include layout="@layout/include_item_details_delimiter"/>
+
+    <EditText
+        android:id="@+id/detailsEditText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="@string/hint_details"
+        android:inputType="textMultiLine"
+        android:layout_marginLeft="@dimen/horizontal_margin"
+        android:layout_marginRight="@dimen/horizontal_margin"/>
+</LinearLayout>

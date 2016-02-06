@@ -1,0 +1,203 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/statsToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/blue"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/accent_grey_200"
+                android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/vertical_padding"
+            android:paddingTop="@dimen/vertical_padding"
+            tools:context="com.tr.bnotes.ItemDetailsActivity">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/horizontal_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="@dimen/description_field_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/from"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:id="@+id/fromDateText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="start"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+            </LinearLayout>
+
+            <include layout="@layout/include_item_stats_delimiter"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/horizontal_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="@dimen/description_field_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/to"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:id="@+id/toDateText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="start"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+            </LinearLayout>
+
+            <include layout="@layout/include_item_stats_delimiter"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/horizontal_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="@dimen/description_field_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/income"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plus_sign"
+                    android:textColor="@color/primary_color"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:id="@+id/incomeAmountView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="start"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:textColor="@color/primary_color"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/include_item_stats_delimiter"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/horizontal_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="@dimen/description_field_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/expenses"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/minus_sign"
+                    android:textColor="@color/accent_color"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:id="@+id/expenseAmountView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="start"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:textColor="@color/accent_color"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/include_item_stats_delimiter"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/horizontal_margin"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="@dimen/description_field_width"
+                    android:layout_height="wrap_content"
+                    android:text="@string/margin"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+
+                <TextView
+                    android:id="@+id/marginAmountTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:gravity="start"
+                    android:textSize="@dimen/stats_activity_text_size"/>
+            </LinearLayout>
+
+            <include layout="@layout/include_item_stats_delimiter"/>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                app:tabIndicatorColor="@color/primary_color"/>
+
+            <lecho.lib.hellocharts.view.PieChartView
+                android:id="@+id/chart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:minWidth="200dp">
+            </lecho.lib.hellocharts.view.PieChartView>
+            <TextView
+                android:id="@+id/noChartDataTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:visibility="gone"
+                android:gravity="center"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

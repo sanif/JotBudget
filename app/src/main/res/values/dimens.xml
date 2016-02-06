@@ -1,0 +1,24 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="horizontal_margin">16dp</dimen>
+    <dimen name="vertical_margin">8dp</dimen>
+
+    <dimen name="horizontal_padding">16dp</dimen>
+    <dimen name="vertical_padding">8dp</dimen>
+
+    <dimen name="delimiter_size">0.5dp</dimen>
+    <dimen name="recycler_item_tile_height">72dp</dimen>
+    <dimen name="recycler_item_margin_between_rows">4dp</dimen>
+    <dimen name="recycler_item_image_size">48dp</dimen>
+
+    <dimen name="description_field_width">125dp</dimen>
+    <dimen name="item_details_text_size">25sp</dimen>
+
+    <dimen name="stats_activity_text_size">18sp</dimen>
+
+    <dimen name="pie_chart_text1_size">14sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="primary_text_size">18sp</dimen>
+    <dimen name="secondary_text_size">16sp</dimen>
+</resources>
