@@ -15,7 +15,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/detailsToolBar"
+            android:id="@+id/details_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"/>
@@ -37,7 +37,7 @@
             android:textSize="@dimen/item_details_text_size"/>
 
         <EditText
-            android:id="@+id/typeValueEditText"
+            android:id="@+id/sub_type_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -70,7 +70,7 @@
             android:textSize="@dimen/item_details_text_size"/>
 
         <EditText
-            android:id="@+id/dateValText"
+            android:id="@+id/date_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -96,13 +96,13 @@
             android:textSize="@dimen/item_details_text_size"/>
 
         <TextView
-            android:id="@+id/signView"
+            android:id="@+id/sign_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/item_details_text_size"/>
 
         <com.tr.bnotes.NoSelectionEditText
-            android:id="@+id/amountView"
+            android:id="@+id/amount_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -117,7 +117,7 @@
     <include layout="@layout/include_item_details_delimiter"/>
 
     <EditText
-        android:id="@+id/detailsEditText"
+        android:id="@+id/details_edit_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"

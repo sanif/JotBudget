@@ -11,7 +11,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/statsToolBar"
+            android:id="@+id/stats_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/blue"
@@ -47,7 +47,7 @@
                     android:textSize="@dimen/stats_activity_text_size"/>
 
                 <TextView
-                    android:id="@+id/fromDateText"
+                    android:id="@+id/from_date_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -72,7 +72,7 @@
                     android:textSize="@dimen/stats_activity_text_size"/>
 
                 <TextView
-                    android:id="@+id/toDateText"
+                    android:id="@+id/to_date_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -104,7 +104,7 @@
                     android:textSize="@dimen/stats_activity_text_size"/>
 
                 <TextView
-                    android:id="@+id/incomeAmountView"
+                    android:id="@+id/income_amount_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -139,7 +139,7 @@
                     android:textSize="@dimen/stats_activity_text_size"/>
 
                 <TextView
-                    android:id="@+id/expenseAmountView"
+                    android:id="@+id/expense_amount_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -167,7 +167,7 @@
                     android:textSize="@dimen/stats_activity_text_size"/>
 
                 <TextView
-                    android:id="@+id/marginAmountTextView"
+                    android:id="@+id/margin_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -192,7 +192,7 @@
                 android:minWidth="200dp">
             </lecho.lib.hellocharts.view.PieChartView>
             <TextView
-                android:id="@+id/noChartDataTextView"
+                android:id="@+id/no_chart_data_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/transparent"

@@ -81,7 +81,7 @@ public class ItemListFragment extends Fragment
 
 
         final RecyclerView itemListRecyclerView
-                = ButterKnife.findById(rootView, R.id.itemListRecyclerView);
+                = ButterKnife.findById(rootView, R.id.item_list_recycler_view);
         mAdapter = new ItemListAdapter(this, this);
         new AsyncTask<Void, Void, Void>() {
             @Override

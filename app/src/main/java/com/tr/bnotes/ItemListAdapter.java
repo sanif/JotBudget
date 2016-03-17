@@ -159,12 +159,12 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
-        @Bind(R.id.itemDetailsTextView) TextView detailsTextView;
-        @Bind(R.id.itemTypeTextView) TextView headerTextView;
-        @Bind(R.id.itemImageView) ImageView itemImage;
-        @Bind(R.id.itemDateTextView) TextView dateTextView;
-        @Bind(R.id.amountTextView) TextView moneyAmountTextView;
-        @Bind(R.id.itemLayout) LinearLayout itemLayout;
+        @Bind(R.id.item_details_text) TextView detailsTextView;
+        @Bind(R.id.item_type_text) TextView headerTextView;
+        @Bind(R.id.item_image) ImageView itemImage;
+        @Bind(R.id.item_date_text) TextView dateTextView;
+        @Bind(R.id.amount_text) TextView moneyAmountTextView;
+        @Bind(R.id.item_layout) LinearLayout itemLayout;
 
         private final OnClickListener onClickListener;
         private final OnLongClickListener onLongClickListener;

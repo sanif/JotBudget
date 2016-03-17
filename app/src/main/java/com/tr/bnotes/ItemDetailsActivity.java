@@ -50,10 +50,10 @@ public class ItemDetailsActivity extends AppCompatActivity {
     private Item mOriginalItem;
     private int mActivityItemType;
 
-    @Bind(R.id.typeValueEditText) TextView mSubTypeTextView;
-    @Bind(R.id.dateValText) TextView mDateTextView;
-    @Bind(R.id.amountView) EditText mAmountEditText;
-    @Bind(R.id.detailsEditText) TextView mDetailsTextView;
+    @Bind(R.id.sub_type_text) TextView mSubTypeTextView;
+    @Bind(R.id.date_text) TextView mDateTextView;
+    @Bind(R.id.amount_edit_text) EditText mAmountEditText;
+    @Bind(R.id.details_edit_text) TextView mDetailsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        Toolbar toolbar = ButterKnife.findById(this, R.id.detailsToolBar);
+        Toolbar toolbar = ButterKnife.findById(this, R.id.details_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -71,7 +71,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.dateValText)
+    @OnClick(R.id.date_text)
     void onDateClicked() {
         long previousTimeValue = DateUtil.parse(mDateTextView.getText().toString());
         Util.showDatePicker(mDateTextView.getContext(), new DatePickerDialog.OnDateSetListener() {
@@ -85,7 +85,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.typeValueEditText)
+    @OnClick(R.id.sub_type_text)
     void onSubtypeClicked(View v) {
         hideKeyboard(v);
         displaySubTypePickerDialog();
@@ -128,7 +128,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
         }
         mSubTypeTextView.setTextColor(color);
         mAmountEditText.setTextColor(color);
-        final TextView signTextView = ButterKnife.findById(this, R.id.signView);
+        final TextView signTextView = ButterKnife.findById(this, R.id.sign_view);
         signTextView.setText(sign);
         signTextView.setTextColor(color);
     }
@@ -185,7 +185,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSaveItem:
+            case R.id.menu_item_save:
                 if (saveItem()) {
                     setResult(RESULT_CREATED_OR_UPDATED);
                     finish();

@@ -41,12 +41,12 @@ public class StatsActivity extends AppCompatActivity {
     private int mSecondaryTextColor;
 
     @Bind(R.id.chart) PieChartView mChart;
-    @Bind(R.id.fromDateText) TextView mFromDateView;
-    @Bind(R.id.toDateText) TextView mToDateView;
-    @Bind(R.id.incomeAmountView) TextView mIncomeView;
-    @Bind(R.id.expenseAmountView) TextView mExpenseView;
-    @Bind(R.id.noChartDataTextView) TextView mNoChartDataTextView;
-    @Bind(R.id.marginAmountTextView) TextView mMargin;
+    @Bind(R.id.from_date_text) TextView mFromDateView;
+    @Bind(R.id.to_date_text) TextView mToDateView;
+    @Bind(R.id.income_amount_text) TextView mIncomeView;
+    @Bind(R.id.expense_amount_text) TextView mExpenseView;
+    @Bind(R.id.no_chart_data_text) TextView mNoChartDataTextView;
+    @Bind(R.id.margin_text) TextView mMargin;
 
     private ConsolidatedStatement mConsolidatedStatement;
     private int mSelectedTabPosition;
@@ -68,7 +68,7 @@ public class StatsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initColors();
 
-        Toolbar toolbar = ButterKnife.findById(this, R.id.statsToolBar);
+        Toolbar toolbar = ButterKnife.findById(this, R.id.stats_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -91,7 +91,7 @@ public class StatsActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.fromDateText)
+    @OnClick(R.id.from_date_text)
     void onFromDateTextClicked(View v) {
         long previousTimeValue = DateUtil.parse(mFromDateView.getText().toString());
         Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
@@ -110,7 +110,7 @@ public class StatsActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unused")
-    @OnClick(R.id.toDateText)
+    @OnClick(R.id.to_date_text)
     void onToDateTextClicked(View v) {
         long previousTimeValue = DateUtil.parse(mToDateView.getText().toString());
         Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
