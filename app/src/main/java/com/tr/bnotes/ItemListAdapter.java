@@ -25,11 +25,19 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemViewHolder> {
+    public interface OnLongClickListener {
+        void onLongClick(View v, int adapterPosition);
+    }
+
+    public interface OnClickListener {
+        void onClick(View v, int adapterPosition);
+    }
+
     private Cursor mCursor;
     private ItemDao.ColumnIndices mCursorColumnIndices;
     private int mCount;
-    private final ItemViewHolder.OnClickListener mOnClickListener;
-    private final ItemViewHolder.OnLongClickListener mOnLongClickListener;
+    private final OnClickListener mOnClickListener;
+    private final OnLongClickListener mOnLongClickListener;
 
     // calendars are expensive to re-create in terms of allocation so we keep 'em cached
     private final Calendar mToday = Calendar.getInstance();
@@ -37,8 +45,8 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
 
     private SparseBooleanArray mSelectedItems = new SparseBooleanArray();
 
-    public ItemListAdapter(ItemViewHolder.OnClickListener onClickListener,
-                           ItemViewHolder.OnLongClickListener onLongClickListener) {
+    public ItemListAdapter(OnClickListener onClickListener,
+                           OnLongClickListener onLongClickListener) {
         mOnClickListener = onClickListener;
         mOnLongClickListener = onLongClickListener;
     }
@@ -191,14 +199,6 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
         public boolean onLongClick(View v) {
             onLongClickListener.onLongClick(v, getAdapterPosition());
             return true;
-        }
-
-        interface OnLongClickListener {
-            void onLongClick(View v, int adapterPosition);
-        }
-
-        interface OnClickListener {
-            void onClick(View v, int adapterPosition);
         }
     }
 }

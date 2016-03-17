@@ -26,8 +26,7 @@ import butterknife.ButterKnife;
 
 
 public class ItemListFragment extends Fragment
-        implements ItemListAdapter.ItemViewHolder.OnClickListener,
-        ItemListAdapter.ItemViewHolder.OnLongClickListener,
+        implements ItemListAdapter.OnClickListener, ItemListAdapter.OnLongClickListener,
         View.OnTouchListener,
         ActionMode.Callback {
     public static final String TAG = ItemListFragment.class.getSimpleName();
