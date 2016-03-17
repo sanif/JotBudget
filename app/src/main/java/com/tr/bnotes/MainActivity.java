@@ -9,36 +9,35 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.tr.bnotes.util.Util;
 import com.tr.expenses.BuildConfig;
 import com.tr.expenses.R;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity
-        implements View.OnClickListener,
-        ItemListFragment.OnItemListFragmentTouchedListener,
+        implements ItemListFragment.OnItemListFragmentTouchedListener,
         ItemListFragment.OnItemListUpdatedListener {
     public static final String TAG = MainActivity.class.getSimpleName();
 
-    private FloatingActionMenu mFloatingActionsMenu;
-    private TextView mNoItemsText;
+    @Bind(R.id.floating_actions_menu) FloatingActionMenu mFloatingActionsMenu;
+    @Bind(R.id.no_items_text) TextView mNoItemsText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         if (BuildConfig.DEBUG) {
             Util.enableStrictMode();
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = ButterKnife.findById(this, R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        mNoItemsText = (TextView) findViewById(R.id.no_items_text);
-
-        setUpFloatingActionsMenu();
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -66,8 +65,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onClick(View v) {
+    @SuppressWarnings("unused")
+    @OnClick({ R.id.new_expense_fab, R.id.new_income_fab, R.id.view_stats_fab })
+    void onFabClicked(View v) {
         final int id = v.getId();
         switch (id) {
             case R.id.new_expense_fab:
@@ -83,16 +83,6 @@ public class MainActivity extends AppCompatActivity
                 throw new AssertionError("Unknown id " + id);
         }
         mFloatingActionsMenu.close(false);
-    }
-
-    private void setUpFloatingActionsMenu() {
-        mFloatingActionsMenu = (FloatingActionMenu) findViewById(R.id.floating_actions_menu);
-        FloatingActionButton newExpenseFab = (FloatingActionButton) findViewById(R.id.new_expense_fab);
-        FloatingActionButton newIncomeFab = (FloatingActionButton) findViewById(R.id.new_income_fab);
-        FloatingActionButton viewStatsFab = (FloatingActionButton) findViewById(R.id.view_stats_fab);
-        newExpenseFab.setOnClickListener(this);
-        newIncomeFab.setOnClickListener(this);
-        viewStatsFab.setOnClickListener(this);
     }
 
     private void startItemDetailsActivityForResult(int activityType) {

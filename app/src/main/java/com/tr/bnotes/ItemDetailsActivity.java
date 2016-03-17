@@ -30,6 +30,10 @@ import com.tr.expenses.R;
 
 import java.util.Calendar;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class ItemDetailsActivity extends AppCompatActivity {
     // Constants for startActivityForResult()
     public static final int REQUEST_CODE = 0;
@@ -46,32 +50,48 @@ public class ItemDetailsActivity extends AppCompatActivity {
     private Item mOriginalItem;
     private int mActivityItemType;
 
-    private TextView mSubTypeTextView;
-    private TextView mDateTextView;
-    private EditText mAmountEditText;
-    private TextView mDetailsTextView;
+    @Bind(R.id.typeValueEditText) TextView mSubTypeTextView;
+    @Bind(R.id.dateValText) TextView mDateTextView;
+    @Bind(R.id.amountView) EditText mAmountEditText;
+    @Bind(R.id.detailsEditText) TextView mDetailsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_details);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detailsToolBar);
+        ButterKnife.bind(this);
+
+        Toolbar toolbar = ButterKnife.findById(this, R.id.detailsToolBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setupContent();
-        setupListeners();
+        setupAmountEditText();
     }
 
+    @SuppressWarnings("unused")
+    @OnClick(R.id.dateValText)
+    void onDateClicked() {
+        long previousTimeValue = DateUtil.parse(mDateTextView.getText().toString());
+        Util.showDatePicker(mDateTextView.getContext(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, monthOfYear, dayOfMonth);
+                mDateTextView.setText(DateUtil.format(cal.getTimeInMillis()));
+            }
+        }, previousTimeValue);
+    }
+
+    @SuppressWarnings("unused")
+    @OnClick(R.id.typeValueEditText)
+    void onSubtypeClicked(View v) {
+        hideKeyboard(v);
+        displaySubTypePickerDialog();
+    }
 
     private void setupContent() {
-        mSubTypeTextView = (TextView) findViewById(R.id.typeValueEditText);
-        mDateTextView = (TextView) findViewById(R.id.dateValText);
-        final TextView signTextView = (TextView) findViewById(R.id.signView);
-        mAmountEditText = (EditText) findViewById(R.id.amountView);
-        mDetailsTextView = (TextView) findViewById(R.id.detailsEditText);
-
         mOriginalItem = getIntent().getParcelableExtra(EXTRA_ITEM_DATA);
         if (mOriginalItem != null) { // we are passed an item to display
             mDateTextView.setText(DateUtil.format(mOriginalItem.getTimeStamp()));
@@ -108,26 +128,12 @@ public class ItemDetailsActivity extends AppCompatActivity {
         }
         mSubTypeTextView.setTextColor(color);
         mAmountEditText.setTextColor(color);
+        final TextView signTextView = ButterKnife.findById(this, R.id.signView);
         signTextView.setText(sign);
         signTextView.setTextColor(color);
     }
 
-    private void setupListeners() {
-        mDateTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long previousTimeValue = DateUtil.parse(mDateTextView.getText().toString());
-                Util.showDatePicker(mDateTextView.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        Calendar cal = Calendar.getInstance();
-                        cal.set(year, monthOfYear, dayOfMonth);
-                        mDateTextView.setText(DateUtil.format(cal.getTimeInMillis()));
-                    }
-                }, previousTimeValue);
-            }
-        });
-
+    private void setupAmountEditText() {
         mAmountEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,15 +171,6 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-            }
-        });
-
-
-        mSubTypeTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                hideKeyboard(v);
-                displaySubTypePickerDialog();
             }
         });
     }

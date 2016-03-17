@@ -21,6 +21,9 @@ import com.tr.expenses.R;
 import java.util.Calendar;
 import java.util.Map;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import lecho.lib.hellocharts.view.PieChartView;
 
 public class StatsActivity extends AppCompatActivity {
@@ -37,45 +40,37 @@ public class StatsActivity extends AppCompatActivity {
     private int mAccentColor;
     private int mSecondaryTextColor;
 
-    private TextView mFromDateView;
-    private TextView mToDateView;
-    private TextView mIncomeView;
-    private TextView mExpenseView;
-    private TextView mNoChartDataTextView;
-    private TextView mMargin;
-    private ConsolidatedStatement mConsolidatedStatement;
-    private PieChartView mChart;
+    @Bind(R.id.chart) PieChartView mChart;
+    @Bind(R.id.fromDateText) TextView mFromDateView;
+    @Bind(R.id.toDateText) TextView mToDateView;
+    @Bind(R.id.incomeAmountView) TextView mIncomeView;
+    @Bind(R.id.expenseAmountView) TextView mExpenseView;
+    @Bind(R.id.noChartDataTextView) TextView mNoChartDataTextView;
+    @Bind(R.id.marginAmountTextView) TextView mMargin;
 
+    private ConsolidatedStatement mConsolidatedStatement;
     private int mSelectedTabPosition;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mFromDateView != null && mToDateView != null) {
-            long toDate = DateUtil.parse(mToDateView.getText().toString());
-            long fromDate = DateUtil.parse(mFromDateView.getText().toString());
-            outState.putLong(TO_DATE_KEY, toDate);
-            outState.putLong(FROM_DATE_KEY, fromDate);
-        }
+
+        long toDate = DateUtil.parse(mToDateView.getText().toString());
+        long fromDate = DateUtil.parse(mFromDateView.getText().toString());
+        outState.putLong(TO_DATE_KEY, toDate);
+        outState.putLong(FROM_DATE_KEY, fromDate);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
+        ButterKnife.bind(this);
         initColors();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.statsToolBar);
+        Toolbar toolbar = ButterKnife.findById(this, R.id.statsToolBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mChart = (PieChartView) findViewById(R.id.chart);
-        mFromDateView = (TextView) findViewById(R.id.fromDateText);
-        mNoChartDataTextView = (TextView) findViewById(R.id.noChartDataTextView);
-        mToDateView = (TextView) findViewById(R.id.toDateText);
-        mIncomeView = (TextView) findViewById(R.id.incomeAmountView);
-        mExpenseView = (TextView) findViewById(R.id.expenseAmountView);
-        mMargin = (TextView) findViewById(R.id.marginAmountTextView);
 
         if (savedInstanceState != null) {
             long toDate = savedInstanceState.getLong(TO_DATE_KEY);
@@ -89,58 +84,53 @@ public class StatsActivity extends AppCompatActivity {
         }
 
         PieChartUtil.initChart(mChart);
-        setupDateViews();
+
         setupTabLayout();
 
         refreshDisplayedData();
     }
 
-    private void setupDateViews() {
-        mFromDateView.setOnClickListener(new View.OnClickListener() {
+    @SuppressWarnings("unused")
+    @OnClick(R.id.fromDateText)
+    void onFromDateTextClicked(View v) {
+        long previousTimeValue = DateUtil.parse(mFromDateView.getText().toString());
+        Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
             @Override
-            public void onClick(View v) {
-                long previousTimeValue = DateUtil.parse(mFromDateView.getText().toString());
-                Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        long newDateMillis = millisFromCalendarDate(year, monthOfYear, dayOfMonth);
-                        updateDateView(mFromDateView, newDateMillis);
-                        long toDate = DateUtil.parse(mToDateView.getText().toString());
-                        long fromDate = DateUtil.parse(mFromDateView.getText().toString());
-                        if (fromDate > toDate) {
-                            updateDateView(mToDateView, newDateMillis);
-                        }
-                        refreshDisplayedData();
-                    }
-                }, previousTimeValue);
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                long newDateMillis = millisFromCalendarDate(year, monthOfYear, dayOfMonth);
+                updateDateView(mFromDateView, newDateMillis);
+                long toDate = DateUtil.parse(mToDateView.getText().toString());
+                long fromDate = DateUtil.parse(mFromDateView.getText().toString());
+                if (fromDate > toDate) {
+                    updateDateView(mToDateView, newDateMillis);
+                }
+                refreshDisplayedData();
             }
-        });
-
-        mToDateView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long previousTimeValue = DateUtil.parse(mToDateView.getText().toString());
-                Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        long newDateMillis = millisFromCalendarDate(year, monthOfYear, dayOfMonth);
-                        updateDateView(mToDateView, newDateMillis);
-                        // check if we are before the fromdate
-                        long toDate = DateUtil.parse(mToDateView.getText().toString());
-                        long fromDate = DateUtil.parse(mFromDateView.getText().toString());
-                        if (toDate < fromDate) {
-                            updateDateView(mFromDateView, newDateMillis);
-                        }
-                        refreshDisplayedData();
-                    }
-                }, previousTimeValue);
-            }
-        });
+        }, previousTimeValue);
     }
 
+    @SuppressWarnings("unused")
+    @OnClick(R.id.toDateText)
+    void onToDateTextClicked(View v) {
+        long previousTimeValue = DateUtil.parse(mToDateView.getText().toString());
+        Util.showDatePicker(v.getContext(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                long newDateMillis = millisFromCalendarDate(year, monthOfYear, dayOfMonth);
+                updateDateView(mToDateView, newDateMillis);
+                // check if we are before the fromdate
+                long toDate = DateUtil.parse(mToDateView.getText().toString());
+                long fromDate = DateUtil.parse(mFromDateView.getText().toString());
+                if (toDate < fromDate) {
+                    updateDateView(mFromDateView, newDateMillis);
+                }
+                refreshDisplayedData();
+            }
+        }, previousTimeValue);
+    }
 
     private void setupTabLayout() {
-        final TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        final TabLayout tabLayout = ButterKnife.findById(this, R.id.tabs);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.income_chart)),
                 TAB_POSITION_INCOME);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.expense_chart)),

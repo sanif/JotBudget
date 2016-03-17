@@ -21,6 +21,9 @@ import com.tr.expenses.R;
 
 import java.util.Calendar;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemViewHolder> {
     private Cursor mCursor;
     private ItemDao.ColumnIndices mCursorColumnIndices;
@@ -156,28 +159,25 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener, View.OnLongClickListener {
-        private final TextView detailsTextView;
-        private final TextView headerTextView;
-        private final ImageView itemImage;
-        private final TextView dateTextView;
-        private final TextView moneyAmountTextView;
+        @Bind(R.id.itemDetailsTextView) TextView detailsTextView;
+        @Bind(R.id.itemTypeTextView) TextView headerTextView;
+        @Bind(R.id.itemImageView) ImageView itemImage;
+        @Bind(R.id.itemDateTextView) TextView dateTextView;
+        @Bind(R.id.amountTextView) TextView moneyAmountTextView;
+        @Bind(R.id.itemLayout) LinearLayout itemLayout;
+
         private final OnClickListener onClickListener;
         private final OnLongClickListener onLongClickListener;
-        private final LinearLayout itemLayout;
-        private final View view;
+        private final View rootView;
 
         public ItemViewHolder(View v, OnClickListener onClickListener,
                               OnLongClickListener onLongClickListener) {
             super(v);
-            view = v;
-            view.setOnClickListener(this);
-            view.setOnLongClickListener(this);
-            itemLayout = (LinearLayout) view.findViewById(R.id.itemLayout);
-            detailsTextView = (TextView) view.findViewById(R.id.itemDetailsTextView);
-            headerTextView = (TextView) view.findViewById(R.id.itemTypeTextView);
-            itemImage = (ImageView) view.findViewById(R.id.itemImageView);
-            dateTextView = (TextView) view.findViewById(R.id.itemDateTextView);
-            moneyAmountTextView = (TextView) view.findViewById(R.id.amountTextView);
+            ButterKnife.bind(this, v);
+
+            rootView = v;
+            rootView.setOnClickListener(this);
+            rootView.setOnLongClickListener(this);
             this.onClickListener = onClickListener;
             this.onLongClickListener = onLongClickListener;
         }

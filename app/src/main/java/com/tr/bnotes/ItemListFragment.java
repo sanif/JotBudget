@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import com.tr.bnotes.db.ItemDao;
 import com.tr.expenses.R;
 
+import butterknife.ButterKnife;
+
 
 public class ItemListFragment extends Fragment
         implements ItemListAdapter.ItemViewHolder.OnClickListener,
@@ -77,8 +79,9 @@ public class ItemListFragment extends Fragment
         rootView.setTag(TAG);
         rootView.setOnTouchListener(this);
 
+
         final RecyclerView itemListRecyclerView
-                = (RecyclerView) rootView.findViewById(R.id.itemListRecyclerView);
+                = ButterKnife.findById(rootView, R.id.itemListRecyclerView);
         mAdapter = new ItemListAdapter(this, this);
         new AsyncTask<Void, Void, Void>() {
             @Override
