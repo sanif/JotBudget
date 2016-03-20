@@ -5,11 +5,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.tr.bnotes.Item;
 import com.tr.expenses.BuildConfig;
 
 import java.util.Arrays;
 
-public class ItemReaderDbHelper extends SQLiteOpenHelper {
+class ItemDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "items.db";
 
@@ -29,7 +30,7 @@ public class ItemReaderDbHelper extends SQLiteOpenHelper {
             + ItemContract.Item.COLUMN_TIME_STAMP + " INTEGER NOT NULL, "
             + ItemContract.Item.COLUMN_DESCRIPTION + " TEXT);";
 
-    public ItemReaderDbHelper(Context context) {
+    public ItemDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -39,6 +40,7 @@ public class ItemReaderDbHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ITEM);
 
         populateItemSubtype(db);
+
         if (BuildConfig.DEBUG) {
             DebugContentGenerator.generateItemList(db);
         }
@@ -56,8 +58,8 @@ public class ItemReaderDbHelper extends SQLiteOpenHelper {
         Arrays.sort(expenseTypes);
         Arrays.sort(incomeType);
 
-        insertItemSubtypes(writableDb, ItemContract.ITEM_TYPE_EXPENSE, expenseTypes);
-        insertItemSubtypes(writableDb, ItemContract.ITEM_TYPE_INCOME, incomeType);
+        insertItemSubtypes(writableDb, Item.TYPE_EXPENSE, expenseTypes);
+        insertItemSubtypes(writableDb, Item.TYPE_INCOME, incomeType);
     }
 
     private static void insertItemSubtypes(SQLiteDatabase writableDb, int type, String[] subtypes) {

@@ -5,23 +5,11 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.StrictMode;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Calendar;
 
-public class Util {
+public final class Util {
     private Util() {
 
-    }
-
-    // Show me pre-JDK7 project which does not have this method!
-    public static void close(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ignored) {
-            }
-        }
     }
 
     public static void showDatePicker(Context context, DatePickerDialog.OnDateSetListener listener, long time) {

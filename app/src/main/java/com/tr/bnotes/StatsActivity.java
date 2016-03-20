@@ -1,7 +1,6 @@
 package com.tr.bnotes;
 
 import android.app.DatePickerDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
@@ -11,10 +10,11 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
-import com.tr.bnotes.db.ItemDao;
+import com.tr.bnotes.db.ItemManager;
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
 import com.tr.bnotes.util.PieChartUtil;
+import com.tr.bnotes.util.RxUtil;
 import com.tr.bnotes.util.Util;
 import com.tr.expenses.R;
 
@@ -25,6 +25,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import lecho.lib.hellocharts.view.PieChartView;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class StatsActivity extends AppCompatActivity {
 
@@ -33,13 +37,6 @@ public class StatsActivity extends AppCompatActivity {
     private static final String FROM_DATE_KEY = "from_date";
     private static final String TO_DATE_KEY = "to_date";
 
-    private int[] mExpenseColors;
-    private int[] mIncomeColors;
-
-    private int mPrimaryColor;
-    private int mAccentColor;
-    private int mSecondaryTextColor;
-
     @Bind(R.id.chart) PieChartView mChart;
     @Bind(R.id.from_date_text) TextView mFromDateView;
     @Bind(R.id.to_date_text) TextView mToDateView;
@@ -47,6 +44,14 @@ public class StatsActivity extends AppCompatActivity {
     @Bind(R.id.expense_amount_text) TextView mExpenseView;
     @Bind(R.id.no_chart_data_text) TextView mNoChartDataTextView;
     @Bind(R.id.margin_text) TextView mMargin;
+
+    private int[] mExpenseColors;
+    private int[] mIncomeColors;
+
+    private int mPrimaryColor;
+    private int mAccentColor;
+    private int mSecondaryTextColor;
+    private Subscription mConsolidatedStatementSubscription;
 
     private ConsolidatedStatement mConsolidatedStatement;
     private int mSelectedTabPosition;
@@ -88,6 +93,12 @@ public class StatsActivity extends AppCompatActivity {
         setupTabLayout();
 
         refreshDisplayedData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RxUtil.unsubscribe(mConsolidatedStatementSubscription);
     }
 
     @SuppressWarnings("unused")
@@ -162,19 +173,17 @@ public class StatsActivity extends AppCompatActivity {
         final long from = DateUtil.parse(mFromDateView.getText().toString());
         final long to = DateUtil.parse(mToDateView.getText().toString());
 
-        new AsyncTask<Void, Void, ConsolidatedStatement>() {
-            @Override
-            protected ConsolidatedStatement doInBackground(Void... params) {
-                return ItemDao.readConsolidatedStatementForPeriod(StatsActivity.this, from, to);
-            }
-
-            @Override
-            protected void onPostExecute(ConsolidatedStatement consolidatedStatement) {
-                mConsolidatedStatement = consolidatedStatement;
-                displayStatementData();
-                displayChart();
-            }
-        }.execute();
+        mConsolidatedStatementSubscription = ItemManager.getConsolidatedStatement(from, to)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Action1<ConsolidatedStatement>() {
+                @Override
+                public void call(ConsolidatedStatement consolidatedStatement) {
+                    mConsolidatedStatement = consolidatedStatement;
+                    displayStatementData();
+                    displayChart();
+                }
+            });
     }
 
     private void displayChart() {

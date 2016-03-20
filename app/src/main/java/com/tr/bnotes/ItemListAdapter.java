@@ -1,7 +1,6 @@
 package com.tr.bnotes;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
@@ -13,13 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.tr.bnotes.db.ItemDao;
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
-import com.tr.bnotes.util.Util;
 import com.tr.expenses.R;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -33,9 +32,7 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
         void onClick(View v, int adapterPosition);
     }
 
-    private Cursor mCursor;
-    private ItemDao.ColumnIndices mCursorColumnIndices;
-    private int mCount;
+    private List<Item> mItemList = Collections.emptyList();
     private final OnClickListener mOnClickListener;
     private final OnLongClickListener mOnLongClickListener;
 
@@ -59,8 +56,8 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
 
     @Override
     public void onBindViewHolder(ItemViewHolder itemViewHolder, final int position) {
-        mCursor.moveToPosition(position);
-        final Item item = ItemDao.fromCursorRow(mCursorColumnIndices, mCursor);
+
+        final Item item = mItemList.get(position);
         itemViewHolder.detailsTextView.setText(item.getDescription());
         itemViewHolder.headerTextView.setText(item.getSubType());
 
@@ -107,31 +104,21 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
 
     @Override
     public int getItemCount() {
-        return mCount;
+        return mItemList.size();
     }
 
     public Item getItem(int position) {
-        mCursor.moveToPosition(position);
-        return ItemDao.fromCursorRow(mCursorColumnIndices, mCursor);
+        return mItemList.get(position);
     }
 
-    public int itemId(int position) { // whoops, getItemId() clashes with the RecyclerView.Adapter.getItemId() :(
-        mCursor.moveToPosition(position);
-        return ItemDao.getItemId(mCursorColumnIndices, mCursor);
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) {
+    public void setData(List<Item> itemList) {
+        if (itemList == mItemList) {
             return;
         }
-        final Cursor oldCursor = mCursor;
-        mCursor = newCursor;
-        mCursorColumnIndices = new ItemDao.ColumnIndices(mCursor);
-        mCount = mCursor.getCount();
+        mItemList = itemList;
         clearSelected();
-        Util.close(oldCursor);
-        // Update today's date if the last cursor was swapped on previous day (in case somebody is
-        // using the app @ midnight for example)
+        // Update today's date if the last item list was was set on a previous day (in case somebody
+        // is using the app @ midnight for example)
         mToday.setTimeInMillis(System.currentTimeMillis());
     }
 

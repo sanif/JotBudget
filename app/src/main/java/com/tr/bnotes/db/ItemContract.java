@@ -6,9 +6,6 @@ final class ItemContract {
     private ItemContract() {
     }
 
-    public static final int ITEM_TYPE_EXPENSE = 0;
-    public static final int ITEM_TYPE_INCOME = 1;
-
     static abstract class ItemSubtype implements BaseColumns {
         public static final String TABLE_NAME = "item_type";
         public static final String COLUMN_ITEM_TYPE = "type";

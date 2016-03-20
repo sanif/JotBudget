@@ -8,7 +8,7 @@ import lecho.lib.hellocharts.model.PieChartData;
 import lecho.lib.hellocharts.model.SliceValue;
 import lecho.lib.hellocharts.view.PieChartView;
 
-public class PieChartUtil {
+public final class PieChartUtil {
     private PieChartUtil() {
 
     }

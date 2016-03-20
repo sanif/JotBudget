@@ -1,7 +1,7 @@
 package com.tr.bnotes.util;
 
 
-public class CurrencyUtil {
+public final class CurrencyUtil {
     private static final String DECIMAL_FORMAT = "%02d";
 
     private CurrencyUtil() {

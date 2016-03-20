@@ -4,8 +4,6 @@ package com.tr.bnotes;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,10 +17,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tr.bnotes.db.ItemDao;
+import com.tr.bnotes.db.ItemManager;
+import com.tr.bnotes.util.RxUtil;
 import com.tr.expenses.R;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 
 public class ItemListFragment extends Fragment
@@ -30,8 +36,6 @@ public class ItemListFragment extends Fragment
         View.OnTouchListener,
         ActionMode.Callback {
     public static final String TAG = ItemListFragment.class.getSimpleName();
-    private ItemListAdapter mAdapter;
-    private ActionMode mActiveActionMode;
 
     public interface OnItemListFragmentTouchedListener {
         void onItemListFragmentTouched();
@@ -41,8 +45,34 @@ public class ItemListFragment extends Fragment
         void onItemListUpdated(int itemCountAfterUpdate);
     }
 
+    private ItemListAdapter mAdapter;
+    private ActionMode mActiveActionMode;
+
+    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+
     private boolean isActionModeActive() {
         return mActiveActionMode != null;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.item_list_fragment, container, false);
+        rootView.setTag(TAG);
+        rootView.setOnTouchListener(this);
+
+
+        final RecyclerView itemListRecyclerView
+                = ButterKnife.findById(rootView, R.id.item_list_recycler_view);
+        mAdapter = new ItemListAdapter(this, this);
+        updateView();
+        setupRecyclerView(itemListRecyclerView, mAdapter);
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        RxUtil.unsubscribe(mCompositeSubscription);
     }
 
     @Override
@@ -72,32 +102,6 @@ public class ItemListFragment extends Fragment
         mActiveActionMode = getActivity().startActionMode(this);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.item_list_fragment, container, false);
-        rootView.setTag(TAG);
-        rootView.setOnTouchListener(this);
-
-
-        final RecyclerView itemListRecyclerView
-                = ButterKnife.findById(rootView, R.id.item_list_recycler_view);
-        mAdapter = new ItemListAdapter(this, this);
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                readItemDataAndSwapCursor(getActivity());
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                notifyAdapterDataSetChanged();
-            }
-        }.execute();
-
-        setupRecyclerView(itemListRecyclerView, mAdapter);
-        return rootView;
-    }
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -120,7 +124,7 @@ public class ItemListFragment extends Fragment
             case R.id.delete:
                 if (mAdapter.hasItemsSelected()) {
                     SparseBooleanArray selectedPositions = mAdapter.drainSelectedPositions();
-                    deleteListItemsAndUpdate(getContext(), selectedPositions);
+                    deleteSelectedPositions(getContext(), selectedPositions);
                 }
                 mActiveActionMode.finish();
                 return true;
@@ -146,47 +150,16 @@ public class ItemListFragment extends Fragment
     }
 
     public void updateView() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                readItemDataAndSwapCursor(getActivity());
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                notifyAdapterDataSetChanged();
-            }
-        }.execute();
-    }
-
-    private void readItemDataAndSwapCursor(Context context) {
-        Cursor listCursor = ItemDao.readAllOrderedByDate(context);
-        mAdapter.swapCursor(listCursor);
-    }
-
-    private void deleteListItemsAndUpdate(final Context context,
-                                          final SparseBooleanArray selectedPositions) {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                deleteSelectedPositions(context, selectedPositions);
-                readItemDataAndSwapCursor(context);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                notifyAdapterDataSetChanged();
-            }
-        }.execute();
-
-    }
-
-    private void notifyAdapterDataSetChanged() {
-        mAdapter.notifyDataSetChanged();
-        notifyActivityAboutItemListUpdate(mAdapter.getItemCount());
+        Subscription sub = ItemManager.readItems()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Action1<List<Item>>() {
+                @Override
+                public void call(List<Item> items) {
+                    setData(items);
+                }
+            });
+        mCompositeSubscription.add(sub);
     }
 
     private void notifyActivityAboutItemListUpdate(int itemCountAfterUpdate) {
@@ -206,11 +179,27 @@ public class ItemListFragment extends Fragment
         for (int i = 0; i < selectedPositions.size(); i++) {
             boolean selected = selectedPositions.valueAt(i);
             if (selected) {
-                ids[i] = String.valueOf(mAdapter.itemId(selectedPositions.keyAt(i)));
+                ids[i] = String.valueOf(mAdapter.getItem(selectedPositions.keyAt(i)).getId());
             }
         }
 
-        ItemDao.delete(context, ids);
+        Subscription sub = ItemManager.deleteItems(ids)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Action1<List<Item>>() {
+                @Override
+                public void call(List<Item> items) {
+                    setData(items);
+                }
+            });
+        mCompositeSubscription.add(sub);
+
+    }
+
+    private void setData(List<Item> items) {
+        mAdapter.setData(items);
+        mAdapter.notifyDataSetChanged();
+        notifyActivityAboutItemListUpdate(mAdapter.getItemCount());
     }
 
     private static void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {

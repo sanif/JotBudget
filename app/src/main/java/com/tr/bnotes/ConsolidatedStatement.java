@@ -2,6 +2,7 @@ package com.tr.bnotes;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,46 +18,38 @@ public final class ConsolidatedStatement {
     private final long mTotalExpense;
     private final long mTotalIncome;
 
-    private ConsolidatedStatement(Map<String, Long> expenses, Map<String, Long> incomes,
-                                  long totalExpense, long totalIncome) {
+    private ConsolidatedStatement(Map<String, Long> expenses, Map<String, Long> incomes) {
         mExpenses = Collections.unmodifiableMap(expenses);
         mIncomes = Collections.unmodifiableMap(incomes);
+
+        long totalExpense = 0;
+        for (long expense: expenses.values()) {
+            totalExpense += expense;
+        }
+
+        long totalIncome = 0;
+        for (long income: incomes.values()) {
+            totalIncome += income;
+        }
 
         mTotalExpense = totalExpense;
         mTotalIncome = totalIncome;
     }
 
-    public static final class Builder {
-        private final Map<String, Long> mExpenses = new LinkedHashMap<>();
-        private final Map<String, Long> mIncomes = new LinkedHashMap<>();
-
-        private long mTotalExpense;
-        private long mTotalIncome;
-
-        public Builder addExpense(String type, long val) {
-            mTotalExpense += val;
-            add(mExpenses, type, val);
-            return this;
-        }
-
-        public Builder addIncome(String type, long val) {
-            mTotalIncome += val;
-            add(mIncomes, type, val);
-            return this;
-        }
-
-        public ConsolidatedStatement build() {
-            return new ConsolidatedStatement(mExpenses, mIncomes, mTotalExpense, mTotalIncome);
-        }
-
-        private static void add(Map<String, Long> map, String key, long val) {
-            Long currentVal = map.get(key);
-            if (currentVal == null) {
-                map.put(key, val);
+    public static ConsolidatedStatement from(List<Item> items) {
+        Map<String, Long> expenses = new LinkedHashMap<>();
+        Map<String, Long> incomes = new LinkedHashMap<>();
+        for (Item item: items) {
+            String subType = item.getSubType();
+            long amount = item.getAmount();
+            if (item.getType() == Item.TYPE_EXPENSE) {
+                add(expenses, subType, amount);
             } else {
-                map.put(key, currentVal + val);
+                add(incomes, subType, amount);
             }
         }
+
+        return new ConsolidatedStatement(expenses, incomes);
     }
 
     public Map<String, Long> getExpenses() {
@@ -77,5 +70,14 @@ public final class ConsolidatedStatement {
 
     public long getMargin() {
         return mTotalIncome - mTotalExpense;
+    }
+
+    private static void add(Map<String, Long> map, String key, long val) {
+        Long currentVal = map.get(key);
+        if (currentVal == null) {
+            map.put(key, val);
+        } else {
+            map.put(key, currentVal + val);
+        }
     }
 }

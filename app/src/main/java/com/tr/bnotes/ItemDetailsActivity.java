@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -22,17 +22,25 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.tr.bnotes.db.ItemDao;
+import com.tr.bnotes.db.ItemManager;
+
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
+import com.tr.bnotes.util.RxUtil;
 import com.tr.bnotes.util.Util;
 import com.tr.expenses.R;
 
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class ItemDetailsActivity extends AppCompatActivity {
     // Constants for startActivityForResult()
@@ -47,13 +55,14 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
     private static final int MAX_AMOUNT_FIELD_LENGTH = 13;
 
-    private Item mOriginalItem;
-    private int mActivityItemType;
-
     @Bind(R.id.sub_type_text) TextView mSubTypeTextView;
     @Bind(R.id.date_text) TextView mDateTextView;
     @Bind(R.id.amount_edit_text) EditText mAmountEditText;
     @Bind(R.id.details_edit_text) TextView mDetailsTextView;
+
+    private Item mOriginalItem;
+    private int mActivityItemType;
+    private Subscription mItemTypesSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +77,12 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
         setupContent();
         setupAmountEditText();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RxUtil.unsubscribe(mItemTypesSubscription);
     }
 
     @SuppressWarnings("unused")
@@ -202,28 +217,31 @@ public class ItemDetailsActivity extends AppCompatActivity {
     }
 
     private void displaySubTypePickerDialog() {
-        new AsyncTask<Void, Void, Void>() {
-            private String title;
-            private String[] items;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                String other = getString(R.string.other_ellipsized);
-                if (mActivityItemType == Item.TYPE_EXPENSE) {
-                    title = getString(R.string.pick_expense_type);
-                    items = ItemDao.getExpenseTypes(ItemDetailsActivity.this, other);
-                } else {
-                    title = getString(R.string.pick_income_type);
-                    items = ItemDao.getIncomeTypes(ItemDetailsActivity.this, other);
+        mItemTypesSubscription = ItemManager.getItemTypes(mActivityItemType)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(new Func1<List<String>, String[]>() {
+                @Override
+                public String[] call(List<String> items) {
+                    int itemArrayLen = items.size() + 1;
+                    String[] itemArray = new String[itemArrayLen];
+                    items.toArray(itemArray);
+                    itemArray[itemArrayLen - 1] = getString(R.string.other_ellipsized);
+                    return itemArray;
                 }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                displaySubTypePickerDialog(title, items);
-            }
-        }.execute();
+            })
+            .subscribe(new Action1<String[]>() {
+                @Override
+                public void call(String[] items) {
+                    String title;
+                    if (mActivityItemType == Item.TYPE_EXPENSE) {
+                        title = getString(R.string.pick_expense_type);
+                    } else {
+                        title = getString(R.string.pick_income_type);
+                    }
+                    displaySubTypePickerDialog(title, items);
+                }
+            });
     }
 
     private void displaySubTypePickerDialog(final String title, final String[] items) {
@@ -299,13 +317,10 @@ public class ItemDetailsActivity extends AppCompatActivity {
             id = Item.NO_ID;
         }
         final Item item = new Item(mActivityItemType, subType, details, amount, date, id);
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                ItemDao.putItemIntoDb(ItemDetailsActivity.this, item);
-                return null;
-            }
-        }.execute();
+        ItemManager.saveItem(item)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
         return true;
     }
 }
