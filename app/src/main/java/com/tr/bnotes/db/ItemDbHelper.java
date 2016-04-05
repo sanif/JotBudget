@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.tr.bnotes.Item;
+import com.tr.bnotes.model.Item;
 import com.tr.expenses.BuildConfig;
 
 import java.util.Arrays;

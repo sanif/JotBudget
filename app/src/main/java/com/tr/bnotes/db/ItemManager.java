@@ -1,7 +1,7 @@
 package com.tr.bnotes.db;
 
-import com.tr.bnotes.ConsolidatedStatement;
-import com.tr.bnotes.Item;
+import com.tr.bnotes.model.ConsolidatedStatement;
+import com.tr.bnotes.model.Item;
 
 import java.util.List;
 

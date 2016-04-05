@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -22,12 +22,12 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.tr.bnotes.db.ItemManager;
-
+import com.tr.bnotes.model.Item;
+import com.tr.bnotes.ui.presenter.ItemDetailsPresenter;
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
-import com.tr.bnotes.util.RxUtil;
 import com.tr.bnotes.util.Util;
+import com.tr.bnotes.ui.view.ItemDetailsView;
 import com.tr.expenses.R;
 
 import java.util.Calendar;
@@ -36,13 +36,8 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
-public class ItemDetailsActivity extends AppCompatActivity {
+public class ItemDetailsActivity extends AppCompatActivity implements ItemDetailsView {
     // Constants for startActivityForResult()
     public static final int REQUEST_CODE = 0;
     public static final int RESULT_CREATED_OR_UPDATED = 1;
@@ -62,7 +57,8 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
     private Item mOriginalItem;
     private int mActivityItemType;
-    private Subscription mItemTypesSubscription;
+
+    private ItemDetailsPresenter mItemDetailsPresenter = new ItemDetailsPresenter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +66,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_details);
 
         ButterKnife.bind(this);
+        mItemDetailsPresenter.bind(this);
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.details_toolbar);
         setSupportActionBar(toolbar);
@@ -82,7 +79,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RxUtil.unsubscribe(mItemTypesSubscription);
+        mItemDetailsPresenter.unbind();
     }
 
     @SuppressWarnings("unused")
@@ -106,13 +103,17 @@ public class ItemDetailsActivity extends AppCompatActivity {
         displaySubTypePickerDialog();
     }
 
+    @Override
+    public void showSubTypes(String title, List<String> subTypes) {
+        displaySubTypePickerDialog(title, subTypes);
+    }
+
     private void setupContent() {
         mOriginalItem = getIntent().getParcelableExtra(EXTRA_ITEM_DATA);
         if (mOriginalItem != null) { // we are passed an item to display
             mDateTextView.setText(DateUtil.format(mOriginalItem.getTimeStamp()));
             mDetailsTextView.setText(mOriginalItem.getDescription());
             mDetailsTextView.setText(mOriginalItem.getDescription());
-            ;
             mAmountEditText.setText(CurrencyUtil.toUnsignedCurrencyString(mOriginalItem.getAmount()));
             mActivityItemType = mOriginalItem.getType();
             mSubTypeTextView.setText(mOriginalItem.getSubType());
@@ -212,52 +213,36 @@ public class ItemDetailsActivity extends AppCompatActivity {
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager
+                = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void displaySubTypePickerDialog() {
-        mItemTypesSubscription = ItemManager.getItemTypes(mActivityItemType)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map(new Func1<List<String>, String[]>() {
-                @Override
-                public String[] call(List<String> items) {
-                    int itemArrayLen = items.size() + 1;
-                    String[] itemArray = new String[itemArrayLen];
-                    items.toArray(itemArray);
-                    itemArray[itemArrayLen - 1] = getString(R.string.other_ellipsized);
-                    return itemArray;
-                }
-            })
-            .subscribe(new Action1<String[]>() {
-                @Override
-                public void call(String[] items) {
-                    String title;
-                    if (mActivityItemType == Item.TYPE_EXPENSE) {
-                        title = getString(R.string.pick_expense_type);
-                    } else {
-                        title = getString(R.string.pick_income_type);
-                    }
-                    displaySubTypePickerDialog(title, items);
-                }
-            });
+        mItemDetailsPresenter.loadSubTypes(this, mActivityItemType);
     }
 
-    private void displaySubTypePickerDialog(final String title, final String[] items) {
+    private void displaySubTypePickerDialog(final String title, List<String> subTypeList) {
+        final String other = getString(R.string.other_ellipsized);
+
+        // Add "Other..." item to the end of this list
+        int itemArrayLen = subTypeList.size() + 1;
+        final String[] subTypes = new String[itemArrayLen];
+        subTypeList.toArray(subTypes);
+        subTypes[itemArrayLen - 1] = other;
+
         DialogFragment subTypePickerDialog = new DialogFragment() {
             @NonNull
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                final String other = getString(R.string.other_ellipsized);
-                builder.setTitle(title).setItems(items, new DialogInterface.OnClickListener() {
+                builder.setTitle(title).setItems(subTypes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String text = items[which];
+                        String text = subTypes[which];
                         if (text.equals(other)) {
                             displayCustomSubTypePickerDialog();
                         } else {
-                            mSubTypeTextView.setText(items[which]);
+                            mSubTypeTextView.setText(subTypes[which]);
                         }
                     }
                 });
@@ -317,10 +302,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
             id = Item.NO_ID;
         }
         final Item item = new Item(mActivityItemType, subType, details, amount, date, id);
-        ItemManager.saveItem(item)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+        mItemDetailsPresenter.saveItem(item);
         return true;
     }
 }

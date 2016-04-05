@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
                         = (ItemListFragment) getSupportFragmentManager()
                         .findFragmentByTag(ItemListFragment.TAG);
                 if (itemListFragment != null) {
-                    itemListFragment.updateView();
+                    itemListFragment.loadItems();
                 } else {
                     Log.wtf(TAG, "recyclerViewFragment == null");
                 }

@@ -7,7 +7,7 @@
               android:focusableInTouchMode="true"
               android:orientation="vertical"
               android:paddingBottom="@dimen/vertical_margin"
-              tools:context="com.tr.bnotes.ItemDetailsActivity">
+              tools:context="com.tr.bnotes.ui.ItemDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/item_details_text_size"/>
 
-        <com.tr.bnotes.NoSelectionEditText
+        <com.tr.bnotes.ui.NoSelectionEditText
             android:id="@+id/amount_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

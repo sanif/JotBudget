@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 import android.content.Context;
 import android.widget.Toast;

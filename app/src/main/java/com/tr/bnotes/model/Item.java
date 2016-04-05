@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -46,7 +46,6 @@ public final class Item implements Parcelable {
     public long getAmount() {
         return amount;
     }
-
 
     public int getId() {
         return id;

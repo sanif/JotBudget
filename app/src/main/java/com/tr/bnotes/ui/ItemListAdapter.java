@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.tr.bnotes.model.Item;
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
 import com.tr.expenses.R;
@@ -146,6 +147,17 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
         SparseBooleanArray selectedItems = mSelectedItems;
         mSelectedItems = new SparseBooleanArray();
         return selectedItems;
+    }
+
+    public String[] getSelectedIds() {
+        final String[] ids = new String[mSelectedItems.size()];
+        for (int i = 0; i < mSelectedItems.size(); i++) {
+            boolean selected = mSelectedItems.valueAt(i);
+            if (selected) {
+                ids[i] = String.valueOf(getItem(mSelectedItems.keyAt(i)).getId());
+            }
+        }
+        return ids;
     }
 
     public boolean isSelected(int position) {

@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 
 import android.app.Activity;
@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,24 +16,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tr.bnotes.db.ItemManager;
-import com.tr.bnotes.util.RxUtil;
+import com.tr.bnotes.model.Item;
+import com.tr.bnotes.ui.presenter.ItemListPresenter;
+import com.tr.bnotes.ui.view.ItemListView;
 import com.tr.expenses.R;
 
 import java.util.List;
 
 import butterknife.ButterKnife;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 
 public class ItemListFragment extends Fragment
         implements ItemListAdapter.OnClickListener, ItemListAdapter.OnLongClickListener,
         View.OnTouchListener,
-        ActionMode.Callback {
+        ActionMode.Callback, ItemListView {
     public static final String TAG = ItemListFragment.class.getSimpleName();
 
     public interface OnItemListFragmentTouchedListener {
@@ -48,11 +43,7 @@ public class ItemListFragment extends Fragment
     private ItemListAdapter mAdapter;
     private ActionMode mActiveActionMode;
 
-    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-
-    private boolean isActionModeActive() {
-        return mActiveActionMode != null;
-    }
+    private ItemListPresenter mItemListPresenter = new ItemListPresenter();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,11 +51,12 @@ public class ItemListFragment extends Fragment
         rootView.setTag(TAG);
         rootView.setOnTouchListener(this);
 
+        mItemListPresenter.bind(this);
 
         final RecyclerView itemListRecyclerView
                 = ButterKnife.findById(rootView, R.id.item_list_recycler_view);
         mAdapter = new ItemListAdapter(this, this);
-        updateView();
+        loadItems();
         setupRecyclerView(itemListRecyclerView, mAdapter);
         return rootView;
     }
@@ -72,7 +64,7 @@ public class ItemListFragment extends Fragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        RxUtil.unsubscribe(mCompositeSubscription);
+        mItemListPresenter.unbind();
     }
 
     @Override
@@ -91,7 +83,7 @@ public class ItemListFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ItemDetailsActivity.REQUEST_CODE) {
             if (resultCode == ItemDetailsActivity.RESULT_CREATED_OR_UPDATED) {
-                updateView();
+                loadItems();
             }
         }
     }
@@ -123,8 +115,7 @@ public class ItemListFragment extends Fragment
                 return true;
             case R.id.delete:
                 if (mAdapter.hasItemsSelected()) {
-                    SparseBooleanArray selectedPositions = mAdapter.drainSelectedPositions();
-                    deleteSelectedPositions(getContext(), selectedPositions);
+                    mItemListPresenter.deleteItems(mAdapter.getSelectedIds());
                 }
                 mActiveActionMode.finish();
                 return true;
@@ -149,62 +140,35 @@ public class ItemListFragment extends Fragment
         return false;
     }
 
-    public void updateView() {
-        Subscription sub = ItemManager.readItems()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<List<Item>>() {
-                @Override
-                public void call(List<Item> items) {
-                    setData(items);
-                }
-            });
-        mCompositeSubscription.add(sub);
+    @Override
+    public void showItems(List<Item> items) {
+        setData(items);
     }
 
-    private void notifyActivityAboutItemListUpdate(int itemCountAfterUpdate) {
+    public void loadItems() {
+        mItemListPresenter.loadItems();
+    }
+
+    private boolean isActionModeActive() {
+        return mActiveActionMode != null;
+    }
+
+    private void notifyActivityItemListUpdate(int itemCountAfterUpdate) {
         Activity a = getActivity();
         if (a instanceof OnItemListUpdatedListener) {
             ((OnItemListUpdatedListener) a).onItemListUpdated(itemCountAfterUpdate);
         }
     }
 
-    private synchronized void deleteSelectedPositions(Context context,
-                                                      SparseBooleanArray selectedPositions) {
-        if (selectedPositions.size() <= 0) {
-            throw new IllegalArgumentException("selectedPositions.size() <= 0");
-        }
-
-        final String[] ids = new String[selectedPositions.size()];
-        for (int i = 0; i < selectedPositions.size(); i++) {
-            boolean selected = selectedPositions.valueAt(i);
-            if (selected) {
-                ids[i] = String.valueOf(mAdapter.getItem(selectedPositions.keyAt(i)).getId());
-            }
-        }
-
-        Subscription sub = ItemManager.deleteItems(ids)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<List<Item>>() {
-                @Override
-                public void call(List<Item> items) {
-                    setData(items);
-                }
-            });
-        mCompositeSubscription.add(sub);
-
+    private static void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
+        final Context recyclerViewContext = recyclerView.getContext();
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerViewContext));
+        recyclerView.setAdapter(adapter);
     }
 
     private void setData(List<Item> items) {
         mAdapter.setData(items);
         mAdapter.notifyDataSetChanged();
-        notifyActivityAboutItemListUpdate(mAdapter.getItemCount());
-    }
-
-    private static void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
-        final Context recyclerViewContext = recyclerView.getContext();
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerViewContext));
-        recyclerView.setAdapter(adapter);
+        notifyActivityItemListUpdate(mAdapter.getItemCount());
     }
 }

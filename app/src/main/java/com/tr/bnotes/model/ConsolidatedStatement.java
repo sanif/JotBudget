@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.model;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

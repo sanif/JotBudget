@@ -3,11 +3,9 @@ package com.tr.bnotes.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
-import com.tr.bnotes.Item;
+import com.tr.bnotes.model.Item;
 
 import java.util.List;
 

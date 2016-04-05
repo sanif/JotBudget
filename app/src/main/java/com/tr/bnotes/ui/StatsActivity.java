@@ -1,4 +1,4 @@
-package com.tr.bnotes;
+package com.tr.bnotes.ui;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -10,12 +10,13 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
-import com.tr.bnotes.db.ItemManager;
+import com.tr.bnotes.model.ConsolidatedStatement;
+import com.tr.bnotes.ui.presenter.StatsPresenter;
 import com.tr.bnotes.util.CurrencyUtil;
 import com.tr.bnotes.util.DateUtil;
 import com.tr.bnotes.util.PieChartUtil;
-import com.tr.bnotes.util.RxUtil;
 import com.tr.bnotes.util.Util;
+import com.tr.bnotes.ui.view.StatsView;
 import com.tr.expenses.R;
 
 import java.util.Calendar;
@@ -25,12 +26,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import lecho.lib.hellocharts.view.PieChartView;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
-public class StatsActivity extends AppCompatActivity {
+public class StatsActivity extends AppCompatActivity implements StatsView {
 
     private static final int TAB_POSITION_INCOME = 0;
     private static final int TAB_POSITION_EXPENSE = 1;
@@ -51,10 +48,11 @@ public class StatsActivity extends AppCompatActivity {
     private int mPrimaryColor;
     private int mAccentColor;
     private int mSecondaryTextColor;
-    private Subscription mConsolidatedStatementSubscription;
 
     private ConsolidatedStatement mConsolidatedStatement;
     private int mSelectedTabPosition;
+
+    private StatsPresenter mStatsPresenter = new StatsPresenter();
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -71,6 +69,7 @@ public class StatsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
         ButterKnife.bind(this);
+        mStatsPresenter.bind(this);
         initColors();
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.stats_toolbar);
@@ -98,7 +97,7 @@ public class StatsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RxUtil.unsubscribe(mConsolidatedStatementSubscription);
+        mStatsPresenter.unbind();
     }
 
     @SuppressWarnings("unused")
@@ -140,6 +139,13 @@ public class StatsActivity extends AppCompatActivity {
         }, previousTimeValue);
     }
 
+    @Override
+    public void showConsolidatedStatement(ConsolidatedStatement consolidatedStatement) {
+        mConsolidatedStatement = consolidatedStatement;
+        displayStatementData();
+        displayChart();
+    }
+
     private void setupTabLayout() {
         final TabLayout tabLayout = ButterKnife.findById(this, R.id.tabs);
         tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.income_chart)),
@@ -172,18 +178,7 @@ public class StatsActivity extends AppCompatActivity {
     private void refreshDisplayedData() {
         final long from = DateUtil.parse(mFromDateView.getText().toString());
         final long to = DateUtil.parse(mToDateView.getText().toString());
-
-        mConsolidatedStatementSubscription = ItemManager.getConsolidatedStatement(from, to)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<ConsolidatedStatement>() {
-                @Override
-                public void call(ConsolidatedStatement consolidatedStatement) {
-                    mConsolidatedStatement = consolidatedStatement;
-                    displayStatementData();
-                    displayChart();
-                }
-            });
+        mStatsPresenter.loadConsolidatedStatement(from, to);
     }
 
     private void displayChart() {

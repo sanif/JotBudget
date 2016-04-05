@@ -3,7 +3,7 @@ package com.tr.bnotes.db;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.tr.bnotes.Item;
+import com.tr.bnotes.model.Item;
 import com.tr.bnotes.util.DateUtil;
 import com.tr.expenses.BuildConfig;
 
