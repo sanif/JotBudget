@@ -5,15 +5,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite.SqlBrite;
 import com.tr.bnotes.model.Item;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import rx.Observable;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
+@Singleton
 class ItemDao {
-    private static String[] EMPTY_ARGS = new String[0];
+    private static final String[] EMPTY_ARGS = new String[0];
+
+    private final BriteDatabase mBriteDatabase;
 
     private static class ColumnIndices {
         private final int mIdIdx;
@@ -33,73 +41,72 @@ class ItemDao {
         }
     }
 
-    private ItemDao() {
+    @Inject
+    ItemDao(ItemDbHelper itemDbHelper) {
+        mBriteDatabase = SqlBrite.create()
+                .wrapDatabaseHelper(itemDbHelper, Schedulers.immediate());
     }
 
-    public static long saveItem(Item item) {
-        BriteDatabase db = DbUtil.getSqlBriteDb();
+    public long saveItem(Item item) {
         ContentValues cv = toContentValues(item);
         final int id = item.getId();
         if (id == Item.NO_ID) {
-            return db.insert(ItemContract.Item.TABLE_NAME, cv);
+            return mBriteDatabase.insert(ItemContract.Item.TABLE_NAME, cv);
         } else {
-            return db.update(ItemContract.Item.TABLE_NAME, cv, ItemContract.Item._ID + "=?",  String.valueOf(id));
+            return mBriteDatabase.update(ItemContract.Item.TABLE_NAME, cv,
+                    ItemContract.Item._ID + "=?",  String.valueOf(id));
         }
     }
 
     // reads all the items ordered by date desc
-    public static Observable<List<Item>> readItems() {
+    public Observable<List<Item>> readItems() {
         return readItems("SELECT * FROM " + ItemContract.Item.TABLE_NAME + " ORDER BY "
                 + ItemContract.Item.COLUMN_TIME_STAMP + " DESC", EMPTY_ARGS);
     }
 
-    public static Observable<List<Item>> readItems(long startTime, long endTime) {
+    public Observable<List<Item>> readItems(long startTime, long endTime) {
         String[] args = {String.valueOf(startTime), String.valueOf(endTime)};
         return readItems("SELECT * FROM " + ItemContract.Item.TABLE_NAME + " WHERE "
                 + ItemContract.Item.COLUMN_TIME_STAMP+ " >=? AND "
                 + ItemContract.Item.COLUMN_TIME_STAMP + " <=?", args);
     }
 
-    public static Observable<List<Item>> readItems(String sql, String... args) {
-        return DbUtil.getSqlBriteDb().createQuery(ItemContract.Item.TABLE_NAME, sql, args)
-                .mapToList(new Func1<Cursor, Item>() {
-                    private ColumnIndices mIndices;
+    public Observable<List<Item>> readItems(String sql, String... args) {
+        return mBriteDatabase.createQuery(ItemContract.Item.TABLE_NAME, sql, args)
+            .mapToList(new Func1<Cursor, Item>() {
+                private ColumnIndices mIndices;
 
-                    @Override
-                    public Item call(Cursor cursor) {
-                        // Avoid re-querying column indices
-                        return toItem(getColumnIndices(cursor), cursor);
-                    }
+                @Override
+                public Item call(Cursor cursor) {
+                    // Avoid re-querying column indices
+                    return toItem(getColumnIndices(cursor), cursor);
+                }
 
-                    private ColumnIndices getColumnIndices(Cursor cursor) {
-                        if (mIndices == null) {
-                            mIndices = new ColumnIndices(cursor);
-                        }
-                        return mIndices;
+                private ColumnIndices getColumnIndices(Cursor cursor) {
+                    if (mIndices == null) {
+                        mIndices = new ColumnIndices(cursor);
                     }
-                });
+                    return mIndices;
+                }
+            });
     }
 
-
-    public static int delete(String[] ids) {
-        final String whereClause = ItemContract.Item._ID + " IN (" + DbUtil.makePlaceholders(ids.length) + ")";
-        return DbUtil.getSqlBriteDb().delete(ItemContract.Item.TABLE_NAME, whereClause, ids);
+    public int delete(String[] ids) {
+        final String whereClause = ItemContract.Item._ID
+                + " IN (" + DbUtil.makePlaceholders(ids.length) + ")";
+        return mBriteDatabase.delete(ItemContract.Item.TABLE_NAME, whereClause, ids);
     }
 
     /**
      * Retrieve subtypes of expense or income.
      */
-    public static Observable<List<String>> getTypes(int itemType) {
+    public Observable<List<String>> getTypes(int itemType) {
         if (itemType != Item.TYPE_EXPENSE && itemType != Item.TYPE_INCOME) {
             throw new IllegalArgumentException("type != Item.TYPE_EXPENSE && type != Item.TYPE_INCOME");
         }
 
         final String[] subtypeSelection = new String[]{String.valueOf(itemType)};
-        return DbUtil.getSqlBriteDb().createQuery(
-            ItemContract.ItemSubtype.TABLE_NAME,
-            "SELECT " + ItemContract.ItemSubtype.COLUMN_SUBTYPE
-            + " FROM " + ItemContract.ItemSubtype.TABLE_NAME
-            + " WHERE  " + ItemContract.ItemSubtype.COLUMN_ITEM_TYPE + "=?", subtypeSelection)
+        return mBriteDatabase.createQuery(ItemContract.ItemSubtype.TABLE_NAME, "SELECT " + ItemContract.ItemSubtype.COLUMN_SUBTYPE + " FROM " + ItemContract.ItemSubtype.TABLE_NAME + " WHERE  " + ItemContract.ItemSubtype.COLUMN_ITEM_TYPE + "=?", subtypeSelection)
             .mapToList(new Func1<Cursor, String>() {
                 @Override
                 public String call(Cursor cursor) {

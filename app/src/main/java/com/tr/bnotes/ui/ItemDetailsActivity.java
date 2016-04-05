@@ -22,6 +22,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.tr.bnotes.App;
 import com.tr.bnotes.model.Item;
 import com.tr.bnotes.ui.presenter.ItemDetailsPresenter;
 import com.tr.bnotes.util.CurrencyUtil;
@@ -32,6 +33,8 @@ import com.tr.expenses.R;
 
 import java.util.Calendar;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -58,7 +61,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
     private Item mOriginalItem;
     private int mActivityItemType;
 
-    private ItemDetailsPresenter mItemDetailsPresenter = new ItemDetailsPresenter();
+    @Inject ItemDetailsPresenter mItemDetailsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
         setContentView(R.layout.activity_item_details);
 
         ButterKnife.bind(this);
+        App.getComponent().inject(this);
         mItemDetailsPresenter.bind(this);
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.details_toolbar);

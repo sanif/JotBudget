@@ -143,12 +143,6 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ItemVi
         }
     }
 
-    public SparseBooleanArray drainSelectedPositions() {
-        SparseBooleanArray selectedItems = mSelectedItems;
-        mSelectedItems = new SparseBooleanArray();
-        return selectedItems;
-    }
-
     public String[] getSelectedIds() {
         final String[] ids = new String[mSelectedItems.size()];
         for (int i = 0; i < mSelectedItems.size(); i++) {

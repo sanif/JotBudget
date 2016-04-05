@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.tr.bnotes.App;
 import com.tr.bnotes.model.ConsolidatedStatement;
 import com.tr.bnotes.ui.presenter.StatsPresenter;
 import com.tr.bnotes.util.CurrencyUtil;
@@ -21,6 +22,8 @@ import com.tr.expenses.R;
 
 import java.util.Calendar;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -52,7 +55,7 @@ public class StatsActivity extends AppCompatActivity implements StatsView {
     private ConsolidatedStatement mConsolidatedStatement;
     private int mSelectedTabPosition;
 
-    private StatsPresenter mStatsPresenter = new StatsPresenter();
+    @Inject StatsPresenter mStatsPresenter;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -69,6 +72,7 @@ public class StatsActivity extends AppCompatActivity implements StatsView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
         ButterKnife.bind(this);
+        App.getComponent().inject(this);
         mStatsPresenter.bind(this);
         initColors();
 

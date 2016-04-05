@@ -16,12 +16,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tr.bnotes.App;
 import com.tr.bnotes.model.Item;
 import com.tr.bnotes.ui.presenter.ItemListPresenter;
 import com.tr.bnotes.ui.view.ItemListView;
 import com.tr.expenses.R;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 
@@ -43,7 +46,7 @@ public class ItemListFragment extends Fragment
     private ItemListAdapter mAdapter;
     private ActionMode mActiveActionMode;
 
-    private ItemListPresenter mItemListPresenter = new ItemListPresenter();
+    @Inject ItemListPresenter mItemListPresenter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class ItemListFragment extends Fragment
         rootView.setTag(TAG);
         rootView.setOnTouchListener(this);
 
+        App.getComponent().inject(this);
         mItemListPresenter.bind(this);
 
         final RecyclerView itemListRecyclerView

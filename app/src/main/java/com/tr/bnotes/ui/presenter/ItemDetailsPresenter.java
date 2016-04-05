@@ -10,6 +10,8 @@ import com.tr.expenses.R;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -17,7 +19,13 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class ItemDetailsPresenter extends BasePresenter<ItemDetailsView> {
+    private ItemManager mItemManager;
     private Subscription mItemTypesSubscription;
+
+    @Inject
+    ItemDetailsPresenter(ItemManager itemManager) {
+        mItemManager = itemManager;
+    }
 
     @Override
     public void unbind() {
@@ -26,7 +34,7 @@ public class ItemDetailsPresenter extends BasePresenter<ItemDetailsView> {
     }
 
     public void loadSubTypes(final Context context, final int itemType) {
-        mItemTypesSubscription = ItemManager.getItemTypes(itemType)
+        mItemTypesSubscription = mItemManager.getItemTypes(itemType)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map(new Func1<List<String>, SubTypes>() {
@@ -50,7 +58,7 @@ public class ItemDetailsPresenter extends BasePresenter<ItemDetailsView> {
     }
 
     public void saveItem(Item item) {
-        ItemManager.saveItem(item)
+        mItemManager.saveItem(item)
             .subscribeOn(Schedulers.io())
             .subscribe();
     }

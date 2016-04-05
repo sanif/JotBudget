@@ -7,6 +7,8 @@ import com.tr.bnotes.ui.view.ItemListView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -14,7 +16,13 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class ItemListPresenter extends BasePresenter<ItemListView> {
+    private ItemManager mItemManager;
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+
+    @Inject
+    ItemListPresenter(ItemManager itemManager) {
+        mItemManager = itemManager;
+    }
 
     @Override
     public void unbind() {
@@ -23,7 +31,7 @@ public class ItemListPresenter extends BasePresenter<ItemListView> {
     }
 
     public void loadItems() {
-        Subscription sub = ItemManager.readItems()
+        Subscription sub = mItemManager.readItems()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Action1<List<Item>>() {
@@ -36,7 +44,7 @@ public class ItemListPresenter extends BasePresenter<ItemListView> {
     }
 
     public void deleteItems(String[] ids) {
-        Subscription sub = ItemManager.deleteItems(ids)
+        Subscription sub = mItemManager.deleteItems(ids)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Action1<List<Item>>() {
