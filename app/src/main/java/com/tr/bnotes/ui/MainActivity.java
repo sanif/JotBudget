@@ -10,9 +10,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+import com.tr.bnotes.App;
+import com.tr.bnotes.event.ItemCreatedOrUpdated;
 import com.tr.bnotes.util.Util;
 import com.tr.expenses.BuildConfig;
 import com.tr.expenses.R;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,11 +32,16 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.floating_actions_menu) FloatingActionMenu mFloatingActionsMenu;
     @Bind(R.id.no_items_text) TextView mNoItemsText;
 
+    @Inject
+    Bus mBus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        App.getComponent().inject(this);
         ButterKnife.bind(this);
+        mBus.register(this);
 
         if (BuildConfig.DEBUG) {
             Util.enableStrictMode();
@@ -48,21 +59,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ItemDetailsActivity.REQUEST_CODE) {
-            if (resultCode == ItemDetailsActivity.RESULT_CREATED_OR_UPDATED) {
-                ItemListFragment itemListFragment
-                        = (ItemListFragment) getSupportFragmentManager()
-                        .findFragmentByTag(ItemListFragment.TAG);
-                if (itemListFragment != null) {
-                    itemListFragment.loadItems();
-                } else {
-                    Log.wtf(TAG, "recyclerViewFragment == null");
-                }
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+    protected void onDestroy() {
+        super.onDestroy();
+        mBus.unregister(this);
     }
 
     @SuppressWarnings("unused")
@@ -85,15 +84,17 @@ public class MainActivity extends AppCompatActivity
         mFloatingActionsMenu.close(false);
     }
 
-    private void startItemDetailsActivityForResult(int activityType) {
-        Intent intent = new Intent(this, ItemDetailsActivity.class);
-        intent.putExtra(ItemDetailsActivity.EXTRA_ACTIVITY_TYPE, activityType);
-        startActivityForResult(intent, ItemDetailsActivity.REQUEST_CODE);
-    }
-
-    private void startStatsActivity() {
-        Intent intent = new Intent(this, StatsActivity.class);
-        startActivity(intent);
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onItemCreatedOrUpdated(ItemCreatedOrUpdated event) {
+        ItemListFragment itemListFragment
+                = (ItemListFragment) getSupportFragmentManager()
+                .findFragmentByTag(ItemListFragment.TAG);
+        if (itemListFragment != null) {
+            itemListFragment.loadItems();
+        } else {
+            Log.wtf(TAG, "recyclerViewFragment == null");
+        }
     }
 
     @Override
@@ -112,5 +113,17 @@ public class MainActivity extends AppCompatActivity
         } else {
             mNoItemsText.setVisibility(View.GONE);
         }
+    }
+
+
+    private void startItemDetailsActivityForResult(int activityType) {
+        Intent intent = new Intent(this, ItemDetailsActivity.class);
+        intent.putExtra(ItemDetailsActivity.EXTRA_ACTIVITY_TYPE, activityType);
+        startActivity(intent);
+    }
+
+    private void startStatsActivity() {
+        Intent intent = new Intent(this, StatsActivity.class);
+        startActivity(intent);
     }
 }

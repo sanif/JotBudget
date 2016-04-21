@@ -22,7 +22,9 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.squareup.otto.Bus;
 import com.tr.bnotes.App;
+import com.tr.bnotes.event.ItemCreatedOrUpdated;
 import com.tr.bnotes.model.Item;
 import com.tr.bnotes.ui.presenter.ItemDetailsPresenter;
 import com.tr.bnotes.util.CurrencyUtil;
@@ -41,10 +43,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ItemDetailsActivity extends AppCompatActivity implements ItemDetailsView {
-    // Constants for startActivityForResult()
-    public static final int REQUEST_CODE = 0;
-    public static final int RESULT_CREATED_OR_UPDATED = 1;
-
     public static final String EXTRA_ITEM_DATA = "EXTRA_ITEM_DATA";
     public static final String EXTRA_ACTIVITY_TYPE = "EXTRA_ACTIVITY_TYPE";
 
@@ -62,6 +60,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
     private int mActivityItemType;
 
     @Inject ItemDetailsPresenter mItemDetailsPresenter;
+    @Inject Bus mBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,7 +206,7 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
         switch (item.getItemId()) {
             case R.id.menu_item_save:
                 if (saveItem()) {
-                    setResult(RESULT_CREATED_OR_UPDATED);
+                    mBus.post(new ItemCreatedOrUpdated());
                     finish();
                     return true;
                 }

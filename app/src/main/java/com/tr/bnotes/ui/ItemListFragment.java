@@ -16,7 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 import com.tr.bnotes.App;
+import com.tr.bnotes.event.ItemCreatedOrUpdated;
 import com.tr.bnotes.model.Item;
 import com.tr.bnotes.ui.presenter.ItemListPresenter;
 import com.tr.bnotes.ui.view.ItemListView;
@@ -47,6 +50,7 @@ public class ItemListFragment extends Fragment
     private ActionMode mActiveActionMode;
 
     @Inject ItemListPresenter mItemListPresenter;
+    @Inject Bus mBus;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class ItemListFragment extends Fragment
 
         App.getComponent().inject(this);
         mItemListPresenter.bind(this);
+        mBus.register(this);
 
         final RecyclerView itemListRecyclerView
                 = ButterKnife.findById(rootView, R.id.item_list_recycler_view);
@@ -68,6 +73,7 @@ public class ItemListFragment extends Fragment
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mBus.unregister(this);
         mItemListPresenter.unbind();
     }
 
@@ -76,19 +82,10 @@ public class ItemListFragment extends Fragment
         if (!isActionModeActive()) {
             Intent intent = new Intent(v.getContext(), ItemDetailsActivity.class);
             intent.putExtra(ItemDetailsActivity.EXTRA_ITEM_DATA, mAdapter.getItem(adapterPosition));
-            startActivityForResult(intent, ItemDetailsActivity.REQUEST_CODE);
+            startActivity(intent);
         } else {
             boolean shouldSelect = !mAdapter.isSelected(adapterPosition);
             mAdapter.setSelected(adapterPosition, shouldSelect);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ItemDetailsActivity.REQUEST_CODE) {
-            if (resultCode == ItemDetailsActivity.RESULT_CREATED_OR_UPDATED) {
-                loadItems();
-            }
         }
     }
 
@@ -162,6 +159,12 @@ public class ItemListFragment extends Fragment
         if (a instanceof OnItemListUpdatedListener) {
             ((OnItemListUpdatedListener) a).onItemListUpdated(itemCountAfterUpdate);
         }
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onItemCreatedOrUpdated(ItemCreatedOrUpdated event) {
+        loadItems();
     }
 
     private static void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
