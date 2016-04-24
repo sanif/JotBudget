@@ -2,13 +2,11 @@ package com.tr.bnotes.ui;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,8 +71,11 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
 
         Toolbar toolbar = ButterKnife.findById(this, R.id.details_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         setupContent();
         setupAmountEditText();
     }
@@ -138,13 +139,17 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
         final int color;
         if (mActivityItemType == Item.TYPE_EXPENSE) {
             color = ContextCompat.getColor(this, R.color.accent_color);
-            getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.accent_color));
             sign = "-";
         } else {
             color = ContextCompat.getColor(this, R.color.primary_color);
-            getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, R.color.primary_color));
             sign = "+";
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setBackgroundDrawable(ContextCompat.getDrawable(this, color));
+        }
+
         mSubTypeTextView.setTextColor(color);
         mAmountEditText.setTextColor(color);
         final TextView signTextView = ButterKnife.findById(this, R.id.sign_view);
@@ -234,25 +239,18 @@ public class ItemDetailsActivity extends AppCompatActivity implements ItemDetail
         subTypeList.toArray(subTypes);
         subTypes[itemArrayLen - 1] = other;
 
-        DialogFragment subTypePickerDialog = new DialogFragment() {
-            @NonNull
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(title).setItems(subTypes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String text = subTypes[which];
-                        if (text.equals(other)) {
-                            displayCustomSubTypePickerDialog();
-                        } else {
-                            mSubTypeTextView.setText(subTypes[which]);
-                        }
-                    }
-                });
-                return builder.create();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title).setItems(subTypes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                String text = subTypes[which];
+                if (text.equals(other)) {
+                    displayCustomSubTypePickerDialog();
+                } else {
+                    mSubTypeTextView.setText(subTypes[which]);
+                }
             }
-        };
-        subTypePickerDialog.show(getSupportFragmentManager(), null);
+        });
+        builder.show();
     }
 
     private void displayCustomSubTypePickerDialog() {
