@@ -1,3 +1,3 @@
-## Budget notes
+## JotBudget.git
 
-Simplest possible app for noting down your income and expenses. [Get it on Google Play](https://play.google.com/store/apps/details?id=com.tr.expenses).
+A simple and clean app for jotting down your income and expenses. 
