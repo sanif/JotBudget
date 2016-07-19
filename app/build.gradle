@@ -12,8 +12,8 @@ android {
         applicationId "com.tr.expenses"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 16
-        versionName "1.15"
+        versionCode 1
+        versionName "1.0.0"
         buildConfigField 'boolean', 'FANCY_DEFAULT_CONTENT_IN_DEBUG', 'false'
     }
     buildTypes {
