@@ -3,7 +3,7 @@
     <string name="add_expense">Add expense</string>
     <string name="add_income">Add income</string>
     <string name="amount">Amount</string>
-    <string name="app_name">Budget Notes</string>
+    <string name="app_name">JotBudget</string>
     <string name="cancel">Cancel</string>
     <string name="custom_expense">Custom expense</string>
     <string name="custom_income">Custom income</string>
@@ -26,12 +26,12 @@
     <string name="new_income">New Income</string>
     <string name="no_expenses_in_this_period">You do not have any expenses\nlogged during this period</string>
     <string name="no_income_in_this_period">You do not have any income\nlogged during this period</string>
-    <string name="no_items_string">Start by noting down your income or expense</string>
+    <string name="no_items_string">No income/expense added</string>
     <string name="ok">OK</string>
     <string name="other_ellipsized">Other…</string>
     <string name="pick_expense_type">Pick expense type</string>
     <string name="pick_income_type">Pick income type</string>
-    <string name="please_pick_the_type">Please, pick the type</string>
+    <string name="please_pick_the_type">The type is mandatory</string>
     <string name="plus_sign">+</string>
     <string name="save">Save</string>
     <string name="title_activity_item_details">Item Details</string>

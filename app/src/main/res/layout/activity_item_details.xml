@@ -7,7 +7,7 @@
               android:focusableInTouchMode="true"
               android:orientation="vertical"
               android:paddingBottom="@dimen/vertical_margin"
-              tools:context="com.tr.bnotes.ui.ItemDetailsActivity">
+              tools:context="com.bestapps.jotbudget.ui.ItemDetailsActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
             android:layout_width="@dimen/description_field_width"
             android:layout_height="wrap_content"
             android:text="@string/expense_type"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
 
         <EditText
             android:id="@+id/sub_type_text"
@@ -50,7 +50,7 @@
             android:selectAllOnFocus="false"
             android:singleLine="true"
             android:textIsSelectable="false"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
     </LinearLayout>
 
     <include layout="@layout/include_item_details_delimiter"/>
@@ -67,7 +67,7 @@
             android:layout_width="@dimen/description_field_width"
             android:layout_height="wrap_content"
             android:text="@string/date"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
 
         <EditText
             android:id="@+id/date_text"
@@ -77,7 +77,7 @@
             android:focusable="false"
             android:gravity="start"
             android:inputType="date"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
     </LinearLayout>
 
     <include layout="@layout/include_item_details_delimiter"/>
@@ -93,15 +93,15 @@
             android:layout_width="@dimen/description_field_width"
             android:layout_height="wrap_content"
             android:text="@string/amount"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
 
         <TextView
             android:id="@+id/sign_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
 
-        <com.tr.bnotes.ui.NoSelectionEditText
+        <com.bestapps.jotbudget.ui.NoSelectionEditText
             android:id="@+id/amount_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
             android:inputType="numberDecimal"
             android:longClickable="false"
             android:maxLength="16"
-            android:textSize="@dimen/item_details_text_size"/>
+            android:textSize="@dimen/primary_text_size"/>
     </LinearLayout>
 
     <include layout="@layout/include_item_details_delimiter"/>

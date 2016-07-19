@@ -1,6 +1,6 @@
 package com.tr.expenses;
 
-import com.tr.bnotes.util.CurrencyUtil;
+import com.bestapps.jotbudget.util.CurrencyUtil;
 
 import junit.framework.TestCase;
 
